@@ -1,11 +1,6 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Injectable } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { JWT_REFRESH_STRATEGY } from '../constants/auth.constants';
 
 @Injectable()
-export class RefreshTokenGuard implements CanActivate {
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
-    return true;
-  }
-}
+export class RefreshTokenGuard extends AuthGuard(JWT_REFRESH_STRATEGY) {}

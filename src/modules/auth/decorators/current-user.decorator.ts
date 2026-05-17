@@ -1,3 +1,10 @@
-import { SetMetadata } from '@nestjs/common/decorators/core/set-metadata.decorator';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { JwtPayload } from '../interfaces/jwt-payload.interface';
 
-export const CurrentUser = (...args: string[]) => SetMetadata('current-user', args);
+export const CurrentUser = createParamDecorator(
+  (data: keyof JwtPayload | undefined, ctx: ExecutionContext): any => {
+    const request = ctx.switchToHttp().getRequest();
+    const user = request.user as JwtPayload;
+    return data ? user?.[data] : user;
+  },
+);

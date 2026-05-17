@@ -1,3 +1,8 @@
-import { SetMetadata } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-export const Tenant = (...args: string[]) => SetMetadata('tenant', args);
+export const Tenant = createParamDecorator(
+  (_data: unknown, ctx: ExecutionContext): string => {
+    const request = ctx.switchToHttp().getRequest();
+    return request.organizationId as string;
+  },
+);
