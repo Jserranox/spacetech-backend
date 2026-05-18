@@ -1,0 +1,1 @@
+export const BOTS_REDIS_CLIENT = 'BOTS_REDIS_CLIENT';
