@@ -20,6 +20,7 @@ import {
 } from '@aero-agent/database';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { QueueModule } from '@libs/queue';
 import { TenantsModule } from './modules/tenants/tenants.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BotsModule } from './modules/bots/bots.module';
@@ -58,6 +59,7 @@ import { HealthModule } from './modules/health/health.module';
       }),
       inject: [ConfigService],
     }),
+    QueueModule.forRoot(),
     TenantsModule,
     AuthModule,
     BotsModule,

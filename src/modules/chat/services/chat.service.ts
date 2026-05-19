@@ -45,8 +45,13 @@ export class ChatService {
 
     let fullResponse = '';
 
+    const stream =
+      bot.useTools && this.aiService.generateWithTools
+        ? this.aiService.generateWithTools(context)
+        : this.aiService.generateStream(context);
+
     try {
-      for await (const chunk of this.aiService.generateStream(context)) {
+      for await (const chunk of stream) {
         fullResponse += chunk;
         socket.emit('chunk', {
           sessionId,

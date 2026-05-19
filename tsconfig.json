@@ -21,7 +21,15 @@
       "@nestjs/config": ["./node_modules/@nestjs/config"],
       "@nestjs/config/*": ["./node_modules/@nestjs/config/*"],
       "socket.io": ["../node_modules/.pnpm/socket.io@4.8.3/node_modules/socket.io"],
-      "socket.io/*": ["../node_modules/.pnpm/socket.io@4.8.3/node_modules/socket.io/*"]
+      "socket.io/*": ["../node_modules/.pnpm/socket.io@4.8.3/node_modules/socket.io/*"],
+      "@libs/database": ["../libs/database/src/index.ts"],
+      "@libs/database/*": ["../libs/database/src/*"],
+      "@libs/queue": ["../libs/queue/src/index.ts"],
+      "@libs/queue/*": ["../libs/queue/src/*"],
+      "@libs/types": ["../libs/types/src/index.ts"],
+      "@libs/types/*": ["../libs/types/src/*"],
+      "@libs/logger": ["../libs/logger/src/index.ts"],
+      "@libs/logger/*": ["../libs/logger/src/*"]
     }
   }
 }

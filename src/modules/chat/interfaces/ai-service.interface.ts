@@ -9,6 +9,7 @@ export interface IPromptContext {
 
 export interface IAiService {
   generateStream(ctx: IPromptContext): AsyncIterable<string>;
+  generateWithTools?(ctx: IPromptContext): AsyncIterable<string>;
 }
 
 export const AI_SERVICE_TOKEN = 'AI_SERVICE';

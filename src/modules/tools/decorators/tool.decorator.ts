@@ -1,3 +1,5 @@
-import { SetMetadata } from '@nestjs/common';
+export const TOOL_METADATA_KEY = 'tool:metadata';
 
-export const Tool = (...args: string[]) => SetMetadata('tool', args);
+export function Tool(meta: { name: string; description: string }): ClassDecorator {
+  return (target) => Reflect.defineMetadata(TOOL_METADATA_KEY, meta, target);
+}
