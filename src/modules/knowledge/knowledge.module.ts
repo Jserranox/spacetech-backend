@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bullmq';
 import { KnowledgeDocument, DocumentChunk } from '@aero-agent/database';
-import { QueueName } from '@libs/queue';
+import { QueueName } from '@aero-agent/queue';
 import { RagModule } from '../rag/rag.module';
 
 import { DocumentsController } from './controllers/documents.controller';

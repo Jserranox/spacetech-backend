@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import { QueueName, JobName, IngestDocumentJob, IngestUrlJob } from '@libs/queue';
+import { QueueName, JobName, IngestDocumentJob, IngestUrlJob } from '@aero-agent/queue';
 
 @Injectable()
 export class IngestionQueueService {
