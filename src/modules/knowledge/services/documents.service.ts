@@ -7,6 +7,10 @@ import {
   DocumentStatus,
 } from '@aero-agent/database';
 import { DocumentResponseDto } from '../dtos/document-response.dto';
+import { WebhookDispatcherService } from '../../webhooks/services/webhook-dispatcher.service';
+import { WEBHOOK_EVENTS } from '../../webhooks/constants/webhook-events.constants';
+import { AnalyticsService } from '../../analytics/services/analytics.service';
+import { AnalyticsEventType } from '@aero-agent/database';
 
 export interface PaginatedDocuments {
   data: DocumentResponseDto[];
@@ -22,6 +26,8 @@ export class DocumentsService {
     private readonly docRepo: Repository<KnowledgeDocument>,
     @InjectRepository(DocumentChunk)
     private readonly chunkRepo: Repository<DocumentChunk>,
+    private readonly webhookDispatcher: WebhookDispatcherService,
+    private readonly analyticsService: AnalyticsService,
   ) {}
 
   async create(
@@ -97,6 +103,33 @@ export class DocumentsService {
     doc.status = status;
     if (errorMessage !== undefined) doc.errorMessage = errorMessage ?? null;
     if (status === DocumentStatus.READY) doc.processedAt = new Date();
-    return this.docRepo.save(doc);
+    const saved = await this.docRepo.save(doc);
+
+    if (status === DocumentStatus.READY) {
+      this.webhookDispatcher
+        .dispatch(WEBHOOK_EVENTS.DOCUMENT_READY, doc.organizationId, {
+          documentId: doc.id,
+          botId: doc.botId,
+          fileName: doc.fileName,
+          chunkCount: doc.chunkCount,
+        })
+        .catch(() => {});
+
+      this.analyticsService.track(
+        { eventType: AnalyticsEventType.DOCUMENT_PROCESSED, botId: doc.botId },
+        { orgId: doc.organizationId },
+      );
+    } else if (status === DocumentStatus.ERROR) {
+      this.webhookDispatcher
+        .dispatch(WEBHOOK_EVENTS.DOCUMENT_FAILED, doc.organizationId, {
+          documentId: doc.id,
+          botId: doc.botId,
+          fileName: doc.fileName,
+          errorMessage: errorMessage ?? null,
+        })
+        .catch(() => {});
+    }
+
+    return saved;
   }
 }

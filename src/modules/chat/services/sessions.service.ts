@@ -7,6 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Session } from '@aero-agent/database';
 import { BotsService } from '../../bots/services/bots.service';
+import { WebhookDispatcherService } from '../../webhooks/services/webhook-dispatcher.service';
+import { WEBHOOK_EVENTS } from '../../webhooks/constants/webhook-events.constants';
 
 export interface PaginatedSessions {
   data: Session[];
@@ -21,6 +23,7 @@ export class SessionsService {
     @InjectRepository(Session)
     private readonly sessionRepo: Repository<Session>,
     private readonly botsService: BotsService,
+    private readonly webhookDispatcher: WebhookDispatcherService,
   ) {}
 
   async create(
@@ -38,7 +41,17 @@ export class SessionsService {
       isActive: true,
       lastActivityAt: new Date(),
     });
-    return this.sessionRepo.save(session);
+    const saved = await this.sessionRepo.save(session);
+
+    this.webhookDispatcher
+      .dispatch(WEBHOOK_EVENTS.SESSION_STARTED, orgId, {
+        sessionId: saved.id,
+        botId,
+        userId,
+      })
+      .catch(() => {});
+
+    return saved;
   }
 
   async findOne(id: string, orgId: string): Promise<Session> {
@@ -78,7 +91,16 @@ export class SessionsService {
   async close(id: string, orgId: string): Promise<Session> {
     const session = await this.findBasic(id, orgId);
     session.isActive = false;
-    return this.sessionRepo.save(session);
+    const saved = await this.sessionRepo.save(session);
+
+    this.webhookDispatcher
+      .dispatch(WEBHOOK_EVENTS.SESSION_ENDED, orgId, {
+        sessionId: id,
+        botId: session.botId,
+      })
+      .catch(() => {});
+
+    return saved;
   }
 
   async validateActive(id: string): Promise<Session> {

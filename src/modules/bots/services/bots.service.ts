@@ -12,6 +12,8 @@ import { QueryBotsDto } from '../dtos/query-bots-dto';
 import { BotResponseDto } from '../dtos/filters/bot-response.dto';
 import { BotConfigService } from './bot-config.service';
 import { PlanService } from '../../tenants/services/plan.service';
+import { WebhookDispatcherService } from '../../webhooks/services/webhook-dispatcher.service';
+import { WEBHOOK_EVENTS } from '../../webhooks/constants/webhook-events.constants';
 
 export interface PaginatedBots {
   data: Bot[];
@@ -27,6 +29,7 @@ export class BotsService {
     private readonly botRepo: Repository<Bot>,
     private readonly botConfigService: BotConfigService,
     private readonly planService: PlanService,
+    private readonly webhookDispatcher: WebhookDispatcherService,
   ) {}
 
   async create(orgId: string, dto: CreateBotDto): Promise<BotResponseDto> {
@@ -115,7 +118,18 @@ export class BotsService {
       }
     }
 
-    return this.botRepo.save(bot);
+    const saved = await this.botRepo.save(bot);
+
+    this.webhookDispatcher
+      .dispatch(WEBHOOK_EVENTS.BOT_UPDATED, orgId, {
+        botId: saved.id,
+        name: saved.name,
+        llmProvider: saved.llmProvider,
+        llmModel: saved.llmModel,
+      })
+      .catch(() => {});
+
+    return saved;
   }
 
   async softDelete(id: string, orgId: string): Promise<void> {

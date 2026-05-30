@@ -6,6 +6,8 @@ import { AuthModule } from '../auth/auth.module';
 import { BotsModule } from '../bots/bots.module';
 import { AiModule } from '../ai/ai.module';
 import { RagModule } from '../rag/rag.module';
+import { WebhooksModule } from '../webhooks/webhooks.module';
+import { AnalyticsModule } from '../analytics/analytics.module';
 
 import { ChatGateway } from './gateways/chat.gateway';
 import { ChatService } from './services/chat.service';
@@ -24,6 +26,8 @@ import { WsExceptionFilter } from './filters/ws-exception.filter';
     BotsModule,
     AiModule,
     RagModule,
+    WebhooksModule,
+    AnalyticsModule,
   ],
   controllers: [SessionsController, MessagesController],
   providers: [
