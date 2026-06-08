@@ -1,12 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
-  KnowledgeDocument,
+  AnalyticsEventType,
   DocumentChunk,
   DocumentStatus,
+  KnowledgeDocument,
+  WebhookEvent,
 } from '@aero-agent/database';
 import { DocumentResponseDto } from '../dtos/document-response.dto';
+import { WebhookDispatcherService } from '../../webhooks/services/webhook-dispatcher.service';
+import { AnalyticsService } from '../../analytics/services/analytics.service';
 
 export interface PaginatedDocuments {
   data: DocumentResponseDto[];
@@ -17,11 +21,15 @@ export interface PaginatedDocuments {
 
 @Injectable()
 export class DocumentsService {
+  private readonly logger = new Logger(DocumentsService.name);
+
   constructor(
     @InjectRepository(KnowledgeDocument)
     private readonly docRepo: Repository<KnowledgeDocument>,
     @InjectRepository(DocumentChunk)
     private readonly chunkRepo: Repository<DocumentChunk>,
+    private readonly webhookDispatcher: WebhookDispatcherService,
+    private readonly analyticsService: AnalyticsService,
   ) {}
 
   async create(
@@ -97,6 +105,33 @@ export class DocumentsService {
     doc.status = status;
     if (errorMessage !== undefined) doc.errorMessage = errorMessage ?? null;
     if (status === DocumentStatus.READY) doc.processedAt = new Date();
-    return this.docRepo.save(doc);
+    const saved = await this.docRepo.save(doc);
+
+    if (status === DocumentStatus.READY) {
+      this.webhookDispatcher
+        .dispatch(WebhookEvent.DOCUMENT_READY, saved.organizationId, {
+          documentId: saved.id,
+          botId: saved.botId,
+          fileName: saved.fileName,
+          chunkCount: saved.chunkCount,
+        })
+        .catch((err) => this.logger.error('Webhook dispatch error (document.ready)', err));
+
+      this.analyticsService.track(
+        { eventType: AnalyticsEventType.DOCUMENT_PROCESSED, botId: saved.botId },
+        { orgId: saved.organizationId },
+      );
+    } else if (status === DocumentStatus.ERROR) {
+      this.webhookDispatcher
+        .dispatch(WebhookEvent.DOCUMENT_FAILED, saved.organizationId, {
+          documentId: saved.id,
+          botId: saved.botId,
+          fileName: saved.fileName,
+          errorMessage: saved.errorMessage,
+        })
+        .catch((err) => this.logger.error('Webhook dispatch error (document.failed)', err));
+    }
+
+    return saved;
   }
 }

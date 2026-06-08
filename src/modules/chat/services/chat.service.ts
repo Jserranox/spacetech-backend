@@ -1,14 +1,15 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { MessageRole } from '@aero-agent/database';
+import { AnalyticsEventType, Message, MessageRole, WebhookEvent } from '@aero-agent/database';
 import { IAiService, AI_SERVICE_TOKEN } from '../interfaces/ai-service.interface';
 import { SessionsService } from './sessions.service';
 import { MessagesService } from './messages.service';
 import { ConversationContextService } from './conversation-context.service';
 import { BotsService } from '../../bots/services/bots.service';
 import { RagService } from '../../rag/services/rag.service';
+import { WebhookDispatcherService } from '../../webhooks/services/webhook-dispatcher.service';
+import { AnalyticsService } from '../../analytics/services/analytics.service';
 import { QueryMessagesDto } from '../dtos/query-messages.dto';
-import { Message } from '@aero-agent/database';
 
 @Injectable()
 export class ChatService {
@@ -20,6 +21,8 @@ export class ChatService {
     private readonly conversationContextService: ConversationContextService,
     private readonly botsService: BotsService,
     private readonly ragService: RagService,
+    private readonly webhookDispatcher: WebhookDispatcherService,
+    private readonly analyticsService: AnalyticsService,
     @Inject(AI_SERVICE_TOKEN) private readonly aiService: IAiService,
   ) {}
 
@@ -29,6 +32,7 @@ export class ChatService {
     orgId: string,
     socket: Socket,
   ): Promise<void> {
+    const startTime = Date.now();
     const session = await this.sessionsService.validateActive(sessionId);
     const bot = await this.botsService.getByIdForOrg(session.botId, orgId);
 
@@ -97,6 +101,28 @@ export class ChatService {
       sessionId,
       totalTokens: tokens,
     });
+
+    this.webhookDispatcher
+      .dispatch(WebhookEvent.MESSAGE_SENT, orgId, {
+        sessionId,
+        messageId: assistantMsg.id,
+        botId: bot.id,
+        role: 'assistant',
+        tokens,
+      })
+      .catch((err) => this.logger.error('Webhook dispatch error (message.sent)', err));
+
+    this.analyticsService.track(
+      {
+        eventType: AnalyticsEventType.MESSAGE_SENT,
+        botId: bot.id,
+        sessionId,
+        messageId: assistantMsg.id,
+        tokensOutput: tokens,
+        latencyMs: Date.now() - startTime,
+      },
+      { orgId },
+    );
   }
 
   async getSessionMessages(

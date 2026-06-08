@@ -1,7 +1,7 @@
 export interface PlanLimits {
   bots: number;
   documents: number;
-  messagesPerMonth: number;
+  messages: number;
   apiKeys: number;
   members: number;
 }

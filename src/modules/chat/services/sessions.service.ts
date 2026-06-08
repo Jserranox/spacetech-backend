@@ -1,12 +1,14 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Session } from '@aero-agent/database';
+import { Session, WebhookEvent } from '@aero-agent/database';
 import { BotsService } from '../../bots/services/bots.service';
+import { WebhookDispatcherService } from '../../webhooks/services/webhook-dispatcher.service';
 
 export interface PaginatedSessions {
   data: Session[];
@@ -17,10 +19,13 @@ export interface PaginatedSessions {
 
 @Injectable()
 export class SessionsService {
+  private readonly logger = new Logger(SessionsService.name);
+
   constructor(
     @InjectRepository(Session)
     private readonly sessionRepo: Repository<Session>,
     private readonly botsService: BotsService,
+    private readonly webhookDispatcher: WebhookDispatcherService,
   ) {}
 
   async create(
@@ -38,7 +43,17 @@ export class SessionsService {
       isActive: true,
       lastActivityAt: new Date(),
     });
-    return this.sessionRepo.save(session);
+    const saved = await this.sessionRepo.save(session);
+
+    this.webhookDispatcher
+      .dispatch(WebhookEvent.SESSION_STARTED, orgId, {
+        sessionId: saved.id,
+        botId,
+        userId,
+      })
+      .catch((err) => this.logger.error('Webhook dispatch error (session.started)', err));
+
+    return saved;
   }
 
   async findOne(id: string, orgId: string): Promise<Session> {
@@ -78,7 +93,16 @@ export class SessionsService {
   async close(id: string, orgId: string): Promise<Session> {
     const session = await this.findBasic(id, orgId);
     session.isActive = false;
-    return this.sessionRepo.save(session);
+    const saved = await this.sessionRepo.save(session);
+
+    this.webhookDispatcher
+      .dispatch(WebhookEvent.SESSION_ENDED, orgId, {
+        sessionId: id,
+        botId: session.botId,
+      })
+      .catch((err) => this.logger.error('Webhook dispatch error (session.ended)', err));
+
+    return saved;
   }
 
   async validateActive(id: string): Promise<Session> {

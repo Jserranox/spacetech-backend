@@ -4,6 +4,8 @@ import { BullModule } from '@nestjs/bullmq';
 import { KnowledgeDocument, DocumentChunk } from '@aero-agent/database';
 import { QueueName } from '@aero-agent/queue';
 import { RagModule } from '../rag/rag.module';
+import { WebhooksModule } from '../webhooks/webhooks.module';
+import { AnalyticsModule } from '../analytics/analytics.module';
 
 import { DocumentsController } from './controllers/documents.controller';
 import { IngestionController } from './controllers/ingestion.controller';
@@ -25,6 +27,8 @@ import { DOCUMENT_PARSERS } from './constants/knowledge.constants';
     TypeOrmModule.forFeature([KnowledgeDocument, DocumentChunk]),
     BullModule.registerQueue({ name: QueueName.INGESTION }),
     RagModule,
+    WebhooksModule,
+    AnalyticsModule,
   ],
   controllers: [DocumentsController, IngestionController],
   providers: [

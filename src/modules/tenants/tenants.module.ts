@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Organization, User, ApiKey } from '@aero-agent/database';
 
 import { AuthModule } from '../auth/auth.module';
+import { AnalyticsModule } from '../analytics/analytics.module';
 
 import { OrganizationsController } from './controllers/organizations.controller';
 import { MembersController } from './controllers/members.controller';
@@ -20,6 +21,7 @@ import { PlanLimitGuard } from './guards/plan-limit.guard';
   imports: [
     TypeOrmModule.forFeature([Organization, User, ApiKey]),
     AuthModule,
+    AnalyticsModule,
   ],
   controllers: [OrganizationsController, MembersController, ApiKeysController],
   providers: [

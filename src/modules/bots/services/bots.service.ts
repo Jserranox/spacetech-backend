@@ -1,17 +1,19 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Bot, BotTone } from '@aero-agent/database';
+import { Bot, BotTone, WebhookEvent } from '@aero-agent/database';
 import { CreateBotDto } from '../dtos/create-bot.dto';
 import { UpdateBotDto } from '../dtos/update-bot.dto';
 import { QueryBotsDto } from '../dtos/query-bots-dto';
 import { BotResponseDto } from '../dtos/filters/bot-response.dto';
 import { BotConfigService } from './bot-config.service';
 import { PlanService } from '../../tenants/services/plan.service';
+import { WebhookDispatcherService } from '../../webhooks/services/webhook-dispatcher.service';
 
 export interface PaginatedBots {
   data: Bot[];
@@ -22,11 +24,14 @@ export interface PaginatedBots {
 
 @Injectable()
 export class BotsService {
+  private readonly logger = new Logger(BotsService.name);
+
   constructor(
     @InjectRepository(Bot)
     private readonly botRepo: Repository<Bot>,
     private readonly botConfigService: BotConfigService,
     private readonly planService: PlanService,
+    private readonly webhookDispatcher: WebhookDispatcherService,
   ) {}
 
   async create(orgId: string, dto: CreateBotDto): Promise<BotResponseDto> {
@@ -115,7 +120,18 @@ export class BotsService {
       }
     }
 
-    return this.botRepo.save(bot);
+    const saved = await this.botRepo.save(bot);
+
+    this.webhookDispatcher
+      .dispatch(WebhookEvent.BOT_UPDATED, orgId, {
+        botId: saved.id,
+        name: saved.name,
+        llmProvider: saved.llmProvider,
+        llmModel: saved.llmModel,
+      })
+      .catch((err) => this.logger.error('Webhook dispatch error (bot.updated)', err));
+
+    return saved;
   }
 
   async softDelete(id: string, orgId: string): Promise<void> {
