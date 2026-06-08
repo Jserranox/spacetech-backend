@@ -32,12 +32,20 @@ export class WebhookDispatcherService {
     orgId: string,
     data: Record<string, unknown>,
   ): Promise<void> {
-    let webhooks: Awaited<ReturnType<WebhooksService['findActiveByOrgAndEvent']>>;
+    let webhooks: Awaited<
+      ReturnType<WebhooksService['findActiveByOrgAndEvent']>
+    >;
 
     try {
-      webhooks = await this.webhooksService.findActiveByOrgAndEvent(orgId, event);
+      webhooks = await this.webhooksService.findActiveByOrgAndEvent(
+        orgId,
+        event,
+      );
     } catch (err) {
-      this.logger.error(`Failed to fetch webhooks for org ${orgId}, event ${event}`, err);
+      this.logger.error(
+        `Failed to fetch webhooks for org ${orgId}, event ${event}`,
+        err,
+      );
       return;
     }
 
@@ -70,7 +78,10 @@ export class WebhookDispatcherService {
   async processDelivery(job: Job<WebhookDeliveryData>): Promise<void> {
     const { webhookId, event, organizationId, deliveryId, data } = job.data;
 
-    const webhook = await this.webhooksService.findOne(webhookId, organizationId);
+    const webhook = await this.webhooksService.findOne(
+      webhookId,
+      organizationId,
+    );
 
     const payload: IWebhookPayload = {
       id: deliveryId,
@@ -81,7 +92,9 @@ export class WebhookDispatcherService {
     };
 
     const body = JSON.stringify(payload);
-    const rawSecret = this.signatureService.decryptSecret(webhook.signingSecret);
+    const rawSecret = this.signatureService.decryptSecret(
+      webhook.signingSecret,
+    );
     const signature = this.signatureService.sign(body, rawSecret);
 
     const timeoutMs = parseInt(process.env.WEBHOOK_TIMEOUT_MS ?? '10000', 10);
@@ -107,10 +120,17 @@ export class WebhookDispatcherService {
       clearTimeout(timer);
 
       const success = response.status >= 200 && response.status < 300;
-      await this.webhooksService.updateDelivery(webhookId, organizationId, response.status, success);
+      await this.webhooksService.updateDelivery(
+        webhookId,
+        organizationId,
+        response.status,
+        success,
+      );
 
       if (!success) {
-        throw new Error(`Webhook delivery failed: HTTP ${response.status} from ${webhook.url}`);
+        throw new Error(
+          `Webhook delivery failed: HTTP ${response.status} from ${webhook.url}`,
+        );
       }
     } catch (err) {
       clearTimeout(timer);

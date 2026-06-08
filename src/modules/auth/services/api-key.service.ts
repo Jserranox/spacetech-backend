@@ -6,7 +6,10 @@ import * as crypto from 'crypto';
 import { ApiKey } from '@aero-agent/database';
 import { CreateApiKeyDto } from '../dtos/create-api-key.dto';
 import { ApiKeyResponseDto } from '../dtos/auth-response.dto';
-import { API_KEY_PREFIX, BCRYPT_SALT_ROUNDS } from '../constants/auth.constants';
+import {
+  API_KEY_PREFIX,
+  BCRYPT_SALT_ROUNDS,
+} from '../constants/auth.constants';
 
 @Injectable()
 export class ApiKeyService {
@@ -15,7 +18,10 @@ export class ApiKeyService {
     private readonly apiKeyRepo: Repository<ApiKey>,
   ) {}
 
-  async create(organizationId: string, dto: CreateApiKeyDto): Promise<ApiKeyResponseDto> {
+  async create(
+    organizationId: string,
+    dto: CreateApiKeyDto,
+  ): Promise<ApiKeyResponseDto> {
     // Generate 32-byte cryptographically random secret
     const secret = crypto.randomBytes(32).toString('hex');
     const keyHash = await bcrypt.hash(secret, BCRYPT_SALT_ROUNDS);
@@ -66,7 +72,9 @@ export class ApiKeyService {
   }
 
   async revoke(id: string, organizationId: string): Promise<void> {
-    const key = await this.apiKeyRepo.findOne({ where: { id, organizationId } });
+    const key = await this.apiKeyRepo.findOne({
+      where: { id, organizationId },
+    });
     if (!key) throw new NotFoundException('API key not found');
     await this.apiKeyRepo.update(id, { isActive: false });
   }

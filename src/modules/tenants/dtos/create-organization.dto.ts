@@ -1,4 +1,10 @@
-import { IsString, IsOptional, MinLength, MaxLength, Matches } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  MinLength,
+  MaxLength,
+  Matches,
+} from 'class-validator';
 
 export class CreateOrganizationDto {
   @IsString()
@@ -9,6 +15,8 @@ export class CreateOrganizationDto {
   @IsOptional()
   @IsString()
   @MaxLength(100)
-  @Matches(/^[a-z0-9-]+$/, { message: 'slug can only contain lowercase letters, numbers, and hyphens' })
+  @Matches(/^[a-z0-9-]+$/, {
+    message: 'slug can only contain lowercase letters, numbers, and hyphens',
+  })
   slug?: string;
 }

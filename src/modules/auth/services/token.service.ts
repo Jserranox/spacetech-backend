@@ -21,8 +21,14 @@ export class TokenService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {
-    this.accessExpiresInSeconds = configService.get<number>('JWT_EXPIRES_IN_SECONDS', 900);
-    this.refreshExpiresIn = configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d');
+    this.accessExpiresInSeconds = configService.get<number>(
+      'JWT_EXPIRES_IN_SECONDS',
+      900,
+    );
+    this.refreshExpiresIn = configService.get<string>(
+      'JWT_REFRESH_EXPIRES_IN',
+      '7d',
+    );
     this.refreshSecret = configService.get<string>(
       'JWT_REFRESH_SECRET',
       'change-refresh-in-production',
@@ -50,7 +56,7 @@ export class TokenService {
         role: payload.role,
         tokenId,
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       { secret: this.refreshSecret, expiresIn: this.refreshExpiresIn as any },
     );
   }
@@ -59,6 +65,11 @@ export class TokenService {
     const tokenId = crypto.randomUUID();
     const accessToken = this.generateAccessToken(payload);
     const refreshToken = this.generateRefreshToken(payload, tokenId);
-    return { accessToken, refreshToken, tokenId, expiresIn: this.accessExpiresInSeconds };
+    return {
+      accessToken,
+      refreshToken,
+      tokenId,
+      expiresIn: this.accessExpiresInSeconds,
+    };
   }
 }

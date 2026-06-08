@@ -4,7 +4,10 @@ import { Tool } from '../decorators/tool.decorator';
 import { ITool, ToolParameterSchema } from '../interfaces/tool.interface';
 import { IToolResult } from '../interfaces/tool-result.interface';
 
-@Tool({ name: 'nasa_search', description: 'Busca imágenes, noticias y datos de la NASA' })
+@Tool({
+  name: 'nasa_search',
+  description: 'Busca imágenes, noticias y datos de la NASA',
+})
 @Injectable()
 export class NasaTool implements ITool {
   name = 'nasa_search';
@@ -12,7 +15,10 @@ export class NasaTool implements ITool {
   parameters: ToolParameterSchema = {
     type: 'object',
     properties: {
-      query: { type: 'string', description: 'Término de búsqueda aeroespacial' },
+      query: {
+        type: 'string',
+        description: 'Término de búsqueda aeroespacial',
+      },
       type: {
         type: 'string',
         enum: ['images', 'apod', 'neo'],
@@ -31,7 +37,9 @@ export class NasaTool implements ITool {
   async execute(params: Record<string, unknown>): Promise<IToolResult> {
     const { query, type } = params as { query: string; type: string };
     const usingDemo = !this.configService.get<string>('NASA_API_KEY');
-    const source = usingDemo ? 'nasa.gov (DEMO_KEY - rate limit reducido)' : 'nasa.gov';
+    const source = usingDemo
+      ? 'nasa.gov (DEMO_KEY - rate limit reducido)'
+      : 'nasa.gov';
 
     try {
       if (type === 'apod') {
@@ -42,7 +50,12 @@ export class NasaTool implements ITool {
         const d = await res.json();
         return {
           success: true,
-          data: { title: d.title, url: d.url, explanation: d.explanation, date: d.date },
+          data: {
+            title: d.title,
+            url: d.url,
+            explanation: d.explanation,
+            date: d.date,
+          },
           source,
         };
       }
@@ -53,11 +66,13 @@ export class NasaTool implements ITool {
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const d = await res.json();
-        const items = (d.collection?.items || []).slice(0, 5).map((item: any) => ({
-          title: item.data?.[0]?.title,
-          description: item.data?.[0]?.description,
-          url: item.links?.[0]?.href,
-        }));
+        const items = (d.collection?.items || [])
+          .slice(0, 5)
+          .map((item: any) => ({
+            title: item.data?.[0]?.title,
+            description: item.data?.[0]?.description,
+            url: item.links?.[0]?.href,
+          }));
         return { success: true, data: items, source: 'images.nasa.gov' };
       }
 
@@ -75,7 +90,8 @@ export class NasaTool implements ITool {
             name: neo.name,
             hazardous: neo.is_potentially_hazardous_asteroid,
             estimatedDiameterKm: neo.estimated_diameter?.kilometers,
-            closeApproachDate: neo.close_approach_data?.[0]?.close_approach_date,
+            closeApproachDate:
+              neo.close_approach_data?.[0]?.close_approach_date,
           }));
         return { success: true, data: neos, source };
       }

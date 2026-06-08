@@ -1,5 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { HealthCheckError, HealthIndicator, HealthIndicatorResult } from '@nestjs/terminus';
+import {
+  HealthCheckError,
+  HealthIndicator,
+  HealthIndicatorResult,
+} from '@nestjs/terminus';
 import type Redis from 'ioredis';
 
 export const HEALTH_REDIS_CLIENT = 'HEALTH_REDIS_CLIENT';
@@ -17,7 +21,9 @@ export class RedisHealthIndicator extends HealthIndicator {
     try {
       const pong = await this.redis.ping();
       if (pong !== 'PONG') {
-        const result = this.getStatus(key, false, { message: `Unexpected response: ${pong}` });
+        const result = this.getStatus(key, false, {
+          message: `Unexpected response: ${pong}`,
+        });
         throw new HealthCheckError('Redis check failed', result);
       }
       return this.getStatus(key, true, { message: 'PONG' });

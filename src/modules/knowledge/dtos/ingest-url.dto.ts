@@ -1,4 +1,10 @@
-import { IsUUID, IsUrl, IsString, IsOptional, MaxLength } from 'class-validator';
+import {
+  IsUUID,
+  IsUrl,
+  IsString,
+  IsOptional,
+  MaxLength,
+} from 'class-validator';
 
 export class IngestUrlDto {
   @IsUUID()

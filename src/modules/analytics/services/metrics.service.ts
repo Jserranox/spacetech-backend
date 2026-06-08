@@ -25,7 +25,10 @@ export class MetricsService {
        ORDER BY 1`,
       [granularity, orgId, from, to],
     );
-    return rows.map((r) => ({ date: new Date(r.date).toISOString(), count: parseInt(r.count, 10) }));
+    return rows.map((r) => ({
+      date: new Date(r.date).toISOString(),
+      count: parseInt(r.count, 10),
+    }));
   }
 
   async getActiveUsers(orgId: string, from: Date, to: Date): Promise<number> {
@@ -47,7 +50,9 @@ export class MetricsService {
     to: Date,
     limit = 10,
   ): Promise<{ botId: string; name: string; count: number }[]> {
-    const rows = await this.dataSource.query<{ botId: string; name: string; count: string }[]>(
+    const rows = await this.dataSource.query<
+      { botId: string; name: string; count: string }[]
+    >(
       `SELECT ae.bot_id AS "botId", b.name AS name, COUNT(*) AS count
        FROM analytics_events ae
        JOIN bots b ON b.id = ae.bot_id
@@ -99,12 +104,13 @@ export class MetricsService {
     topBots: { botId: string; name: string; count: number }[];
     responseTimes: { avg: number; p50: number; p95: number };
   }> {
-    const [messageVolume, activeUsers, topBots, responseTimes] = await Promise.all([
-      this.getMessageVolume(orgId, from, to, granularity),
-      this.getActiveUsers(orgId, from, to),
-      this.getTopBots(orgId, from, to),
-      this.getResponseTimes(orgId, from, to),
-    ]);
+    const [messageVolume, activeUsers, topBots, responseTimes] =
+      await Promise.all([
+        this.getMessageVolume(orgId, from, to, granularity),
+        this.getActiveUsers(orgId, from, to),
+        this.getTopBots(orgId, from, to),
+        this.getResponseTimes(orgId, from, to),
+      ]);
     return { messageVolume, activeUsers, topBots, responseTimes };
   }
 }

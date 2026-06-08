@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { IAiService, IPromptContext } from '../../chat/interfaces/ai-service.interface';
+import {
+  IAiService,
+  IPromptContext,
+} from '../../chat/interfaces/ai-service.interface';
 import { BotConfigService } from '../../bots/services/bot-config.service';
 import { LlmProviderFactory } from '../llm-provider.factory';
 import { PromptBuilderService } from './prompt-builder.service';
@@ -17,11 +20,17 @@ export class AiService implements IAiService {
     private readonly toolRegistry: ToolRegistryService,
   ) {}
 
-  private buildConfig(ctx: IPromptContext, extra?: Partial<LlmConfig>): LlmConfig {
-    const defaults = this.botConfigService.mergeDefaults(ctx.botConfig.llmProvider, {
-      temperature: ctx.botConfig.temperature,
-      maxTokens: ctx.botConfig.maxTokens,
-    });
+  private buildConfig(
+    ctx: IPromptContext,
+    extra?: Partial<LlmConfig>,
+  ): LlmConfig {
+    const defaults = this.botConfigService.mergeDefaults(
+      ctx.botConfig.llmProvider,
+      {
+        temperature: ctx.botConfig.temperature,
+        maxTokens: ctx.botConfig.maxTokens,
+      },
+    );
     return {
       model: ctx.botConfig.llmModel,
       ...defaults,
@@ -49,7 +58,10 @@ export class AiService implements IAiService {
     const schemas = this.toolRegistry.getSchemas();
     const provider = this.factory.create(ctx.botConfig.llmProvider);
     const messages = this.promptBuilder.buildMessages(ctx);
-    const config = this.buildConfig(ctx, { tools: schemas, tool_choice: 'auto' });
+    const config = this.buildConfig(ctx, {
+      tools: schemas,
+      tool_choice: 'auto',
+    });
 
     // First pass — accumulate response to detect tool calls
     let firstResponse = '';
@@ -58,9 +70,14 @@ export class AiService implements IAiService {
     }
 
     // Try to parse structured tool calls from the response
-    let toolCalls: Array<{ name: string; arguments: string | Record<string, unknown> }> | null = null;
+    let toolCalls: Array<{
+      name: string;
+      arguments: string | Record<string, unknown>;
+    }> | null = null;
     try {
-      const parsed = JSON.parse(firstResponse) as { tool_calls?: typeof toolCalls };
+      const parsed = JSON.parse(firstResponse) as {
+        tool_calls?: typeof toolCalls;
+      };
       if (Array.isArray(parsed.tool_calls) && parsed.tool_calls.length > 0) {
         toolCalls = parsed.tool_calls;
       }
@@ -75,7 +92,9 @@ export class AiService implements IAiService {
 
     // Execute all tool calls in parallel
     const toolResults = await Promise.all(
-      toolCalls.map((tc) => this.toolsService.executeFromLlmCall(JSON.stringify(tc))),
+      toolCalls.map((tc) =>
+        this.toolsService.executeFromLlmCall(JSON.stringify(tc)),
+      ),
     );
 
     // Rebuild context with assistant + tool result messages
@@ -85,7 +104,7 @@ export class AiService implements IAiService {
       ...toolResults.map((result, i) => ({
         role: 'tool',
         content: JSON.stringify(result),
-        name: (toolCalls![i] as any).name,
+        name: (toolCalls[i] as any).name,
       })),
     ];
 

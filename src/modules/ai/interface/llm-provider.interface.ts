@@ -11,6 +11,9 @@ export interface LlmConfig {
   maxTokens: number;
   topP?: number;
   systemPrompt?: string;
-  tools?: Array<{ type: 'function'; function: { name: string; description: string; parameters: unknown } }>;
+  tools?: Array<{
+    type: 'function';
+    function: { name: string; description: string; parameters: unknown };
+  }>;
   tool_choice?: 'auto' | 'none' | 'required';
 }

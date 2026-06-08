@@ -23,14 +23,27 @@ export class MetricController {
   async getDashboard(@Tenant() orgId: string, @Query() query: QueryMetricsDto) {
     const from = query.from ? new Date(query.from) : subDays(new Date(), 30);
     const to = query.to ? new Date(query.to) : new Date();
-    return this.metricsService.getDashboard(orgId, from, to, query.granularity ?? 'day');
+    return this.metricsService.getDashboard(
+      orgId,
+      from,
+      to,
+      query.granularity ?? 'day',
+    );
   }
 
   @Get('metrics/messages')
-  async getMessageVolume(@Tenant() orgId: string, @Query() query: QueryMetricsDto) {
+  async getMessageVolume(
+    @Tenant() orgId: string,
+    @Query() query: QueryMetricsDto,
+  ) {
     const from = query.from ? new Date(query.from) : subDays(new Date(), 30);
     const to = query.to ? new Date(query.to) : new Date();
-    return this.metricsService.getMessageVolume(orgId, from, to, query.granularity ?? 'day');
+    return this.metricsService.getMessageVolume(
+      orgId,
+      from,
+      to,
+      query.granularity ?? 'day',
+    );
   }
 
   @Get('metrics/top-bots')

@@ -22,7 +22,9 @@ export class AnalyticsService {
 
   track(dto: TrackEventDto, ctx: { orgId: string }): void {
     if (!dto.botId) {
-      this.logger.warn(`Analytics track skipped: botId required for event ${dto.eventType}`);
+      this.logger.warn(
+        `Analytics track skipped: botId required for event ${dto.eventType}`,
+      );
       return;
     }
     this.analyticsRepo
@@ -37,10 +39,15 @@ export class AnalyticsService {
         tokensOutput: dto.tokensOutput ?? null,
         latencyMs: dto.latencyMs ?? null,
       })
-      .catch((err: Error) => this.logger.warn('Analytics track failed', err.message));
+      .catch((err: Error) =>
+        this.logger.warn('Analytics track failed', err.message),
+      );
   }
 
-  async trackAsync(dto: TrackEventDto, ctx: { orgId: string }): Promise<AnalyticsEvent | null> {
+  async trackAsync(
+    dto: TrackEventDto,
+    ctx: { orgId: string },
+  ): Promise<AnalyticsEvent | null> {
     if (!dto.botId) return null;
     return this.analyticsRepo.save({
       eventType: dto.eventType,

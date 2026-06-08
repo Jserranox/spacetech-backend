@@ -17,7 +17,12 @@ export class BotCacheService {
   }
 
   async setConfig(botId: string, bot: Bot): Promise<void> {
-    await this.redis.set(`${KEY_PREFIX}${botId}`, JSON.stringify(bot), 'EX', TTL_SECONDS);
+    await this.redis.set(
+      `${KEY_PREFIX}${botId}`,
+      JSON.stringify(bot),
+      'EX',
+      TTL_SECONDS,
+    );
   }
 
   async invalidate(botId: string): Promise<void> {

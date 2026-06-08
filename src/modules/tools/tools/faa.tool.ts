@@ -4,7 +4,10 @@ import { Tool } from '../decorators/tool.decorator';
 import { ITool, ToolParameterSchema } from '../interfaces/tool.interface';
 import { IToolResult } from '../interfaces/tool-result.interface';
 
-@Tool({ name: 'faa_airspace', description: 'Consulta NOTAMs y restricciones de espacio aéreo FAA' })
+@Tool({
+  name: 'faa_airspace',
+  description: 'Consulta NOTAMs y restricciones de espacio aéreo FAA',
+})
 @Injectable()
 export class FaaTool implements ITool {
   name = 'faa_airspace';
@@ -12,7 +15,10 @@ export class FaaTool implements ITool {
   parameters: ToolParameterSchema = {
     type: 'object',
     properties: {
-      location: { type: 'string', description: 'Código ICAO del aeropuerto o coordenadas' },
+      location: {
+        type: 'string',
+        description: 'Código ICAO del aeropuerto o coordenadas',
+      },
       type: {
         type: 'string',
         enum: ['notam', 'airspace', 'airport'],
@@ -26,7 +32,8 @@ export class FaaTool implements ITool {
 
   constructor(private readonly configService: ConfigService) {
     this.baseUrl =
-      this.configService.get<string>('FAA_BASE_URL') || 'https://external-api.faa.gov';
+      this.configService.get<string>('FAA_BASE_URL') ||
+      'https://external-api.faa.gov';
   }
 
   async execute(params: Record<string, unknown>): Promise<IToolResult> {

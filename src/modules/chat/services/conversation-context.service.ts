@@ -15,10 +15,13 @@ export class ConversationContextService {
     userMessage: string,
     historySize = DEFAULT_HISTORY_SIZE,
   ): Promise<IPromptContext> {
-    const messages = await this.messagesService.getLastN(sessionId, historySize);
+    const messages = await this.messagesService.getLastN(
+      sessionId,
+      historySize,
+    );
 
     const conversationHistory = messages.map((m) => ({
-      role: m.role as string,
+      role: m.role,
       content: m.content,
     }));
 

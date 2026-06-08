@@ -8,7 +8,13 @@ import { RerankingService } from './services/reranking.service';
 
 @Module({
   imports: [ConfigModule],
-  providers: [RagService, EmbeddingService, RetrievalService, ChunkingService, RerankingService],
+  providers: [
+    RagService,
+    EmbeddingService,
+    RetrievalService,
+    ChunkingService,
+    RerankingService,
+  ],
   exports: [RagService, ChunkingService, EmbeddingService],
 })
 export class RagModule {}

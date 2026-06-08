@@ -1,7 +1,15 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { AnalyticsEventType, Message, MessageRole, WebhookEvent } from '@aero-agent/database';
-import { IAiService, AI_SERVICE_TOKEN } from '../interfaces/ai-service.interface';
+import {
+  AnalyticsEventType,
+  Message,
+  MessageRole,
+  WebhookEvent,
+} from '@aero-agent/database';
+import {
+  IAiService,
+  AI_SERVICE_TOKEN,
+} from '../interfaces/ai-service.interface';
 import { SessionsService } from './sessions.service';
 import { MessagesService } from './messages.service';
 import { ConversationContextService } from './conversation-context.service';
@@ -72,10 +80,18 @@ export class ChatService {
           MessageRole.ASSISTANT,
           fullResponse,
         );
-        socket.emit('chunk', { sessionId, chunk: '', isLast: true, messageId: msg.id });
+        socket.emit('chunk', {
+          sessionId,
+          chunk: '',
+          isLast: true,
+          messageId: msg.id,
+        });
       }
 
-      socket.emit('error', { message: 'Stream interrupted', code: 'STREAM_ERROR' });
+      socket.emit('error', {
+        message: 'Stream interrupted',
+        code: 'STREAM_ERROR',
+      });
       return;
     }
 
@@ -110,7 +126,9 @@ export class ChatService {
         role: 'assistant',
         tokens,
       })
-      .catch((err) => this.logger.error('Webhook dispatch error (message.sent)', err));
+      .catch((err) =>
+        this.logger.error('Webhook dispatch error (message.sent)', err),
+      );
 
     this.analyticsService.track(
       {

@@ -13,7 +13,15 @@ import { MetricsService } from './services/metrics.service';
 import { UsageService } from './services/usage.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AnalyticsEvent, Bot, ApiKey, User, KnowledgeDocument])],
+  imports: [
+    TypeOrmModule.forFeature([
+      AnalyticsEvent,
+      Bot,
+      ApiKey,
+      User,
+      KnowledgeDocument,
+    ]),
+  ],
   controllers: [MetricController],
   providers: [AnalyticsService, MetricsService, UsageService],
   exports: [AnalyticsService, MetricsService, UsageService],

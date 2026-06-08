@@ -14,7 +14,9 @@ export class TenantIsolationGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
-    const request = context.switchToHttp().getRequest<Record<string, unknown>>();
+    const request = context
+      .switchToHttp()
+      .getRequest<Record<string, unknown>>();
     const user = request['user'] as JwtPayload | undefined;
 
     if (!user?.organizationId) return false;

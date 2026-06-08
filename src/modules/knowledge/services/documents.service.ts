@@ -46,7 +46,10 @@ export class DocumentsService {
     return this.docRepo.save(doc);
   }
 
-  async update(id: string, data: Partial<KnowledgeDocument>): Promise<KnowledgeDocument> {
+  async update(
+    id: string,
+    data: Partial<KnowledgeDocument>,
+  ): Promise<KnowledgeDocument> {
     const doc = await this.docRepo.findOne({ where: { id } });
     if (!doc) throw new NotFoundException('Document not found');
     Object.assign(doc, data);
@@ -63,7 +66,10 @@ export class DocumentsService {
 
     const [docs, total] = await this.docRepo
       .createQueryBuilder('doc')
-      .where('doc.botId = :botId AND doc.organizationId = :orgId', { botId, orgId })
+      .where('doc.botId = :botId AND doc.organizationId = :orgId', {
+        botId,
+        orgId,
+      })
       .orderBy('doc.createdAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
@@ -78,7 +84,9 @@ export class DocumentsService {
   }
 
   async findOne(id: string, orgId: string): Promise<KnowledgeDocument> {
-    const doc = await this.docRepo.findOne({ where: { id, organizationId: orgId } });
+    const doc = await this.docRepo.findOne({
+      where: { id, organizationId: orgId },
+    });
     if (!doc) throw new NotFoundException('Document not found');
     return doc;
   }
@@ -115,10 +123,15 @@ export class DocumentsService {
           fileName: saved.fileName,
           chunkCount: saved.chunkCount,
         })
-        .catch((err) => this.logger.error('Webhook dispatch error (document.ready)', err));
+        .catch((err) =>
+          this.logger.error('Webhook dispatch error (document.ready)', err),
+        );
 
       this.analyticsService.track(
-        { eventType: AnalyticsEventType.DOCUMENT_PROCESSED, botId: saved.botId },
+        {
+          eventType: AnalyticsEventType.DOCUMENT_PROCESSED,
+          botId: saved.botId,
+        },
         { orgId: saved.organizationId },
       );
     } else if (status === DocumentStatus.ERROR) {
@@ -129,7 +142,9 @@ export class DocumentsService {
           fileName: saved.fileName,
           errorMessage: saved.errorMessage,
         })
-        .catch((err) => this.logger.error('Webhook dispatch error (document.failed)', err));
+        .catch((err) =>
+          this.logger.error('Webhook dispatch error (document.failed)', err),
+        );
     }
 
     return saved;

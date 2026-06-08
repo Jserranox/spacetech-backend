@@ -38,7 +38,11 @@ export class BotsService {
     const currentCount = await this.botRepo.count({
       where: { organizationId: orgId },
     });
-    const allowed = await this.planService.checkLimit(orgId, 'bots', currentCount);
+    const allowed = await this.planService.checkLimit(
+      orgId,
+      'bots',
+      currentCount,
+    );
     if (!allowed) {
       throw new ForbiddenException('Bot limit reached for your current plan');
     }
@@ -92,7 +96,9 @@ export class BotsService {
   }
 
   async findOne(id: string, orgId: string): Promise<Bot> {
-    const bot = await this.botRepo.findOne({ where: { id, organizationId: orgId } });
+    const bot = await this.botRepo.findOne({
+      where: { id, organizationId: orgId },
+    });
     if (!bot) throw new NotFoundException('Bot not found');
     return bot;
   }
@@ -101,7 +107,8 @@ export class BotsService {
     const bot = await this.findOne(id, orgId);
 
     if (dto.name !== undefined) bot.name = dto.name;
-    if (dto.description !== undefined) bot.description = dto.description ?? null;
+    if (dto.description !== undefined)
+      bot.description = dto.description ?? null;
     if (dto.llmProvider !== undefined) bot.llmProvider = dto.llmProvider;
     if (dto.llmModel !== undefined) bot.llmModel = dto.llmModel;
     if (dto.systemPrompt !== undefined) bot.systemPrompt = dto.systemPrompt;
@@ -113,7 +120,8 @@ export class BotsService {
         temperature: dto.config.temperature,
         maxTokens: dto.config.maxTokens,
       });
-      if (dto.config.temperature !== undefined) bot.temperature = merged.temperature;
+      if (dto.config.temperature !== undefined)
+        bot.temperature = merged.temperature;
       if (dto.config.maxTokens !== undefined) bot.maxTokens = merged.maxTokens;
       if (dto.config.contextWindowSize !== undefined) {
         bot.contextWindowSize = dto.config.contextWindowSize;
@@ -129,7 +137,9 @@ export class BotsService {
         llmProvider: saved.llmProvider,
         llmModel: saved.llmModel,
       })
-      .catch((err) => this.logger.error('Webhook dispatch error (bot.updated)', err));
+      .catch((err) =>
+        this.logger.error('Webhook dispatch error (bot.updated)', err),
+      );
 
     return saved;
   }

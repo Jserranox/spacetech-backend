@@ -1,4 +1,8 @@
-import { Injectable, Inject, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { IDocumentParser } from '../parsers/parser.interface';
 import { DOCUMENT_PARSERS } from '../constants/knowledge.constants';
 
@@ -17,7 +21,9 @@ export class ExtractionService {
   }
 
   async extractFromUrl(url: string): Promise<string> {
-    const urlParser = this.parsers.find((p) => p.mimeTypes.includes('text/url'));
+    const urlParser = this.parsers.find((p) =>
+      p.mimeTypes.includes('text/url'),
+    );
     if (!urlParser) {
       throw new UnprocessableEntityException('URL parser no disponible');
     }

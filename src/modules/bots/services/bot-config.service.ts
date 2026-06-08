@@ -9,10 +9,10 @@ export interface LlmDefaults {
 }
 
 const PROVIDER_DEFAULTS: Record<LlmProvider, LlmDefaults> = {
-  [LlmProvider.OPENAI]:    { temperature: 0.7, maxTokens: 2048, topP: 1 },
+  [LlmProvider.OPENAI]: { temperature: 0.7, maxTokens: 2048, topP: 1 },
   [LlmProvider.ANTHROPIC]: { temperature: 0.7, maxTokens: 4096, topP: 0.9 },
-  [LlmProvider.GROQ]:      { temperature: 0.6, maxTokens: 8192, topP: 1 },
-  [LlmProvider.OLLAMA]:    { temperature: 0.8, maxTokens: 2048, topP: 0.9 },
+  [LlmProvider.GROQ]: { temperature: 0.6, maxTokens: 8192, topP: 1 },
+  [LlmProvider.OLLAMA]: { temperature: 0.8, maxTokens: 2048, topP: 0.9 },
 };
 
 @Injectable()
@@ -21,7 +21,10 @@ export class BotConfigService {
     return PROVIDER_DEFAULTS[provider];
   }
 
-  mergeDefaults(provider: LlmProvider, overrides?: Partial<LlmDefaults>): LlmDefaults {
+  mergeDefaults(
+    provider: LlmProvider,
+    overrides?: Partial<LlmDefaults>,
+  ): LlmDefaults {
     return { ...this.getDefaults(provider), ...overrides };
   }
 

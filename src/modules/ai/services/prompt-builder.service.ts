@@ -10,7 +10,8 @@ const CHARS_PER_TOKEN = 4;
 @Injectable()
 export class PromptBuilderService {
   buildSystemPrompt(bot: Bot): string {
-    const toneDesc = TONE_DESCRIPTIONS[bot.tone] ?? TONE_DESCRIPTIONS[BotTone.FORMAL];
+    const toneDesc =
+      TONE_DESCRIPTIONS[bot.tone] ?? TONE_DESCRIPTIONS[BotTone.FORMAL];
     return buildAerospacePrompt(bot, toneDesc);
   }
 
@@ -43,7 +44,10 @@ export class PromptBuilderService {
 
     const result = [...messages];
     // Trim from index 1 to preserve the system prompt (index 0) and user message (last)
-    while (result.reduce((s, m) => s + estimate(m), 0) > maxTokens && result.length > 2) {
+    while (
+      result.reduce((s, m) => s + estimate(m), 0) > maxTokens &&
+      result.length > 2
+    ) {
       result.splice(1, 1);
     }
 

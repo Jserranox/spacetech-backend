@@ -1,5 +1,9 @@
 import { Controller, Get } from '@nestjs/common';
-import { HealthCheck, HealthCheckService, HealthIndicatorResult } from '@nestjs/terminus';
+import {
+  HealthCheck,
+  HealthCheckService,
+  HealthIndicatorResult,
+} from '@nestjs/terminus';
 import { Public } from '../../auth/decorators/public.decorator';
 import { DatabaseHealthIndicator } from '../indicators/database.indicator';
 import { LlmHealthIndicator } from '../indicators/llm.indicator';
@@ -33,14 +37,26 @@ export class HealthController {
         try {
           return await this.storageIndicator.isHealthy('storage');
         } catch {
-          return { storage: { status: 'up' as const, degraded: true, message: 'unavailable' } };
+          return {
+            storage: {
+              status: 'up' as const,
+              degraded: true,
+              message: 'unavailable',
+            },
+          };
         }
       },
       async (): Promise<HealthIndicatorResult> => {
         try {
           return await this.llmIndicator.isHealthy('llm');
         } catch {
-          return { llm: { status: 'up' as const, degraded: true, message: 'unavailable' } };
+          return {
+            llm: {
+              status: 'up' as const,
+              degraded: true,
+              message: 'unavailable',
+            },
+          };
         }
       },
     ]);

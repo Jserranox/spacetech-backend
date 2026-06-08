@@ -21,11 +21,11 @@ export class IngestionController {
   ) {}
 
   @Get(':id/status')
-  async getStatus(
-    @Param('id') id: string,
-    @Req() req: { user: JwtPayload },
-  ) {
-    const document = await this.documentsService.findOne(id, req.user.organizationId);
+  async getStatus(@Param('id') id: string, @Req() req: { user: JwtPayload }) {
+    const document = await this.documentsService.findOne(
+      id,
+      req.user.organizationId,
+    );
     const jobStatus = await this.ingestionQueue.getJobStatus(id);
     return { document, jobStatus };
   }
@@ -33,10 +33,7 @@ export class IngestionController {
   @Post(':id/reprocess')
   @Roles(MemberRole.ADMIN, MemberRole.OWNER)
   @HttpCode(HttpStatus.ACCEPTED)
-  async reprocess(
-    @Param('id') id: string,
-    @Req() req: { user: JwtPayload },
-  ) {
+  async reprocess(@Param('id') id: string, @Req() req: { user: JwtPayload }) {
     const orgId = req.user.organizationId;
     const doc = await this.documentsService.findOne(id, orgId);
     await this.documentsService.updateStatus(id, DocumentStatus.PENDING);

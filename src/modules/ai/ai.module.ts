@@ -15,9 +15,6 @@ import { LlmProviderFactory } from './llm-provider.factory';
     LlmProviderFactory,
     { provide: AI_SERVICE_TOKEN, useExisting: AiService },
   ],
-  exports: [
-    AiService,
-    { provide: AI_SERVICE_TOKEN, useExisting: AiService },
-  ],
+  exports: [AiService, { provide: AI_SERVICE_TOKEN, useExisting: AiService }],
 })
 export class AiModule {}

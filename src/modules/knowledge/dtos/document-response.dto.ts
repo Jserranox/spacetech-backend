@@ -1,4 +1,8 @@
-import { DocumentStatus, DocumentType, KnowledgeDocument } from '@aero-agent/database';
+import {
+  DocumentStatus,
+  DocumentType,
+  KnowledgeDocument,
+} from '@aero-agent/database';
 
 export class DocumentResponseDto {
   id: string;

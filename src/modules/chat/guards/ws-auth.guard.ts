@@ -27,7 +27,10 @@ export class WsAuthGuard implements CanActivate {
 
   extractToken(client: Socket): string | undefined {
     return (
-      (client.handshake.auth as Record<string, unknown>)?.['token'] as string | undefined) ??
-      (client.handshake.query?.['token'] as string | undefined);
+      ((client.handshake.auth as Record<string, unknown>)?.['token'] as
+        | string
+        | undefined) ??
+      (client.handshake.query?.['token'] as string | undefined)
+    );
   }
 }

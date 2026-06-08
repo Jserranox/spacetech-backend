@@ -1,9 +1,4 @@
-import {
-  IsUrl,
-  IsArray,
-  ArrayMinSize,
-  IsEnum,
-} from 'class-validator';
+import { IsUrl, IsArray, ArrayMinSize, IsEnum } from 'class-validator';
 import { WebhookEvent } from '@aero-agent/database';
 
 export class CreateWebhookDto {

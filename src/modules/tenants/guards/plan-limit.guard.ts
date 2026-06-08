@@ -1,10 +1,18 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { OrganizationPlan } from '@aero-agent/database';
 import { PLAN_REQUIRED_KEY } from '../constants/tenan.constants';
 import { IS_PUBLIC_KEY } from '../../auth/constants/auth.constants';
 import { PlanService } from '../services/plan.service';
-import { UsageService, CurrentUsage } from '../../analytics/services/usage.service';
+import {
+  UsageService,
+  CurrentUsage,
+} from '../../analytics/services/usage.service';
 import { PlanLimits } from '../interfaces/plan-limits.interface';
 
 const PLAN_HIERARCHY: Record<OrganizationPlan, number> = {
@@ -13,7 +21,13 @@ const PLAN_HIERARCHY: Record<OrganizationPlan, number> = {
   [OrganizationPlan.ENTERPRISE]: 3,
 };
 
-const RESOURCE_KEYS = new Set<string>(['bots', 'documents', 'messages', 'apiKeys', 'members']);
+const RESOURCE_KEYS = new Set<string>([
+  'bots',
+  'documents',
+  'messages',
+  'apiKeys',
+  'members',
+]);
 
 @Injectable()
 export class PlanLimitGuard implements CanActivate {
@@ -24,10 +38,10 @@ export class PlanLimitGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const resource = this.reflector.getAllAndOverride<string>(PLAN_REQUIRED_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const resource = this.reflector.getAllAndOverride<string>(
+      PLAN_REQUIRED_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     if (!resource) return true;
 
@@ -37,7 +51,9 @@ export class PlanLimitGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
-    const request = context.switchToHttp().getRequest<Record<string, unknown>>();
+    const request = context
+      .switchToHttp()
+      .getRequest<Record<string, unknown>>();
     const organizationId = request['organizationId'] as string | undefined;
     if (!organizationId) return false;
 

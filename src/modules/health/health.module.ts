@@ -6,7 +6,10 @@ import { StorageService } from '../knowledge/services/storage.service';
 import { HealthController } from './controllers/health.controller';
 import { DatabaseHealthIndicator } from './indicators/database.indicator';
 import { LlmHealthIndicator } from './indicators/llm.indicator';
-import { HEALTH_REDIS_CLIENT, RedisHealthIndicator } from './indicators/redis.indicator';
+import {
+  HEALTH_REDIS_CLIENT,
+  RedisHealthIndicator,
+} from './indicators/redis.indicator';
 import { StorageHealthIndicator } from './indicators/storage.indicator';
 
 @Module({

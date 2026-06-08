@@ -4,7 +4,10 @@ import { KnowledgeDocument } from '@aero-agent/database';
 import { DocumentsService } from './documents.service';
 import { StorageService } from './storage.service';
 import { IngestionQueueService } from './ingestion-queue.service';
-import { ALLOWED_MIME_TYPES, MIME_TO_DOCTYPE } from '../constants/knowledge.constants';
+import {
+  ALLOWED_MIME_TYPES,
+  MIME_TO_DOCTYPE,
+} from '../constants/knowledge.constants';
 import { UploadDocumentDto } from '../dtos/upload-document.dto';
 
 @Injectable()
@@ -23,10 +26,14 @@ export class UploadService {
 
   validateFile(file: Express.Multer.File): void {
     if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
-      throw new BadRequestException(`Tipo de archivo no permitido: ${file.mimetype}`);
+      throw new BadRequestException(
+        `Tipo de archivo no permitido: ${file.mimetype}`,
+      );
     }
     if (file.size > this.maxFileSize) {
-      throw new BadRequestException('El archivo supera el tamaño máximo permitido');
+      throw new BadRequestException(
+        'El archivo supera el tamaño máximo permitido',
+      );
     }
   }
 

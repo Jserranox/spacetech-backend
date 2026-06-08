@@ -33,7 +33,9 @@ export class OrganizationsService {
 
   async getMyOrganization(orgId: string): Promise<OrganizationResponseDto> {
     const org = await this.getById(orgId);
-    const memberCount = await this.userRepo.count({ where: { organizationId: orgId } });
+    const memberCount = await this.userRepo.count({
+      where: { organizationId: orgId },
+    });
     return this.toResponse(org, memberCount);
   }
 
@@ -44,7 +46,9 @@ export class OrganizationsService {
     const org = await this.getById(orgId);
 
     if (dto.slug && dto.slug !== org.slug) {
-      const existing = await this.orgRepo.findOne({ where: { slug: dto.slug } });
+      const existing = await this.orgRepo.findOne({
+        where: { slug: dto.slug },
+      });
       if (existing) throw new ConflictException('Slug already taken');
     }
 
@@ -68,7 +72,8 @@ export class OrganizationsService {
     const target = await this.userRepo.findOne({
       where: { id: targetUserId, organizationId: orgId },
     });
-    if (!target) throw new NotFoundException('Target user not found in this organization');
+    if (!target)
+      throw new NotFoundException('Target user not found in this organization');
 
     await this.orgRepo.manager.transaction(async (manager) => {
       await manager.update(User, requesterId, { role: MemberRole.ADMIN });
@@ -81,12 +86,17 @@ export class OrganizationsService {
       where: { id: requesterId, organizationId: orgId },
     });
     if (!requester || requester.role !== MemberRole.OWNER) {
-      throw new ForbiddenException('Only the owner can delete the organization');
+      throw new ForbiddenException(
+        'Only the owner can delete the organization',
+      );
     }
     await this.orgRepo.softDelete(orgId);
   }
 
-  private toResponse(org: Organization, memberCount?: number): OrganizationResponseDto {
+  private toResponse(
+    org: Organization,
+    memberCount?: number,
+  ): OrganizationResponseDto {
     return {
       id: org.id,
       name: org.name,

@@ -51,7 +51,9 @@ export class SessionsService {
         botId,
         userId,
       })
-      .catch((err) => this.logger.error('Webhook dispatch error (session.started)', err));
+      .catch((err) =>
+        this.logger.error('Webhook dispatch error (session.started)', err),
+      );
 
     return saved;
   }
@@ -100,7 +102,9 @@ export class SessionsService {
         sessionId: id,
         botId: session.botId,
       })
-      .catch((err) => this.logger.error('Webhook dispatch error (session.ended)', err));
+      .catch((err) =>
+        this.logger.error('Webhook dispatch error (session.ended)', err),
+      );
 
     return saved;
   }

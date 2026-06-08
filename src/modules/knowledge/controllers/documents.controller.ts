@@ -52,10 +52,7 @@ export class DocumentsController {
 
   @Post('url')
   @Roles(MemberRole.ADMIN, MemberRole.OWNER)
-  async ingestUrl(
-    @Body() dto: IngestUrlDto,
-    @Req() req: { user: JwtPayload },
-  ) {
+  async ingestUrl(@Body() dto: IngestUrlDto, @Req() req: { user: JwtPayload }) {
     const orgId = req.user.organizationId;
 
     const doc = await this.documentsService.create(dto.botId, orgId, {
@@ -80,11 +77,10 @@ export class DocumentsController {
     @Query() query: QueryDocumentsDto,
     @Req() req: { user: JwtPayload },
   ) {
-    return this.documentsService.findAll(
-      query.botId,
-      req.user.organizationId,
-      { page: query.page, limit: query.limit },
-    );
+    return this.documentsService.findAll(query.botId, req.user.organizationId, {
+      page: query.page,
+      limit: query.limit,
+    });
   }
 
   @Delete(':id')

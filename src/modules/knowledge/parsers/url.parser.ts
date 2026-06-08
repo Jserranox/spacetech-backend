@@ -15,9 +15,6 @@ export class UrlParser implements IDocumentParser {
 
     const text = $('article, main, .content, body').text();
 
-    return text
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 50_000);
+    return text.replace(/\s+/g, ' ').trim().slice(0, 50_000);
   }
 }

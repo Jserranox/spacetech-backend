@@ -3,13 +3,20 @@ import { RAG_CHUNK_SIZE, RAG_CHUNK_OVERLAP } from '../constants/rag.constants';
 
 @Injectable()
 export class ChunkingService {
-  chunkText(text: string, size = RAG_CHUNK_SIZE, overlap = RAG_CHUNK_OVERLAP): string[] {
+  chunkText(
+    text: string,
+    size = RAG_CHUNK_SIZE,
+    overlap = RAG_CHUNK_OVERLAP,
+  ): string[] {
     const chunks = this.splitRecursive(text, size);
     return this.addOverlap(chunks, overlap);
   }
 
   chunkDocument(content: string): { content: string; chunkIndex: number }[] {
-    return this.chunkText(content).map((chunk, chunkIndex) => ({ content: chunk, chunkIndex }));
+    return this.chunkText(content).map((chunk, chunkIndex) => ({
+      content: chunk,
+      chunkIndex,
+    }));
   }
 
   private splitRecursive(text: string, size: number): string[] {

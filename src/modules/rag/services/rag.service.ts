@@ -16,12 +16,18 @@ export class RagService {
   async retrieve(query: string, botId: string): Promise<string[]> {
     try {
       const queryEmbedding = await this.embeddingService.embed(query);
-      const results = await this.retrievalService.similaritySearch(queryEmbedding, botId);
+      const results = await this.retrievalService.similaritySearch(
+        queryEmbedding,
+        botId,
+      );
       if (!results.length) return [];
       const reranked = this.rerankingService.rerank(query, results);
       return reranked.map((chunk) => chunk.content);
     } catch (error) {
-      this.logger.warn('RAG retrieve failed, returning empty context', (error as Error).message);
+      this.logger.warn(
+        'RAG retrieve failed, returning empty context',
+        (error as Error).message,
+      );
       return [];
     }
   }

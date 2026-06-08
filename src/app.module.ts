@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ValidationPipe } from '@nestjs/common';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { TenantIsolationGuard } from './modules/tenants/guards/tenant-isolation.guard';
 import { RolesGuard } from './modules/tenants/guards/roles.guard';
@@ -31,6 +32,11 @@ import { KnowledgeModule } from './modules/knowledge/knowledge.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { HealthModule } from './modules/health/health.module';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { TimeoutInterceptor } from './common/interceptors/timeout.interceptor';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 @Module({
   imports: [
@@ -73,10 +79,32 @@ import { HealthModule } from './modules/health/health.module';
   controllers: [AppController],
   providers: [
     AppService,
+
+    // Guards — orden: JWT → tenant → roles → plan
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: TenantIsolationGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_GUARD, useClass: PlanLimitGuard },
+
+    // Filters — HttpExceptionFilter primero (específico), AllExceptionsFilter como catch-all
+    { provide: APP_FILTER, useClass: HttpExceptionFilter },
+    { provide: APP_FILTER, useClass: AllExceptionsFilter },
+
+    // Interceptors — orden de ejecución: logging → timeout → transform
+    { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: TimeoutInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
+
+    // Pipe global de validación
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+        transformOptions: { enableImplicitConversion: true },
+      }),
+    },
   ],
 })
 export class AppModule {}

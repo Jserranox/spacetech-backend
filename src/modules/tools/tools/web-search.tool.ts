@@ -4,11 +4,15 @@ import { Tool } from '../decorators/tool.decorator';
 import { ITool, ToolParameterSchema } from '../interfaces/tool.interface';
 import { IToolResult } from '../interfaces/tool-result.interface';
 
-@Tool({ name: 'web_search', description: 'Realiza búsqueda web para información aeroespacial actualizada' })
+@Tool({
+  name: 'web_search',
+  description: 'Realiza búsqueda web para información aeroespacial actualizada',
+})
 @Injectable()
 export class WebSearchTool implements ITool {
   name = 'web_search';
-  description = 'Realiza búsqueda web para información aeroespacial actualizada';
+  description =
+    'Realiza búsqueda web para información aeroespacial actualizada';
   parameters: ToolParameterSchema = {
     type: 'object',
     properties: {
@@ -32,7 +36,10 @@ export class WebSearchTool implements ITool {
     const { query, num = '5' } = params as { query: string; num?: string };
 
     if (!this.apiKey) {
-      return { success: false, error: 'Web search no configurado (SERPAPI_KEY faltante)' };
+      return {
+        success: false,
+        error: 'Web search no configurado (SERPAPI_KEY faltante)',
+      };
     }
 
     try {
@@ -46,7 +53,11 @@ export class WebSearchTool implements ITool {
         .map((r) => ({ title: r.title, link: r.link, snippet: r.snippet }));
       return { success: true, data: results, source: 'serpapi.com' };
     } catch (err) {
-      return { success: false, error: (err as Error).message, source: 'serpapi.com' };
+      return {
+        success: false,
+        error: (err as Error).message,
+        source: 'serpapi.com',
+      };
     }
   }
 }

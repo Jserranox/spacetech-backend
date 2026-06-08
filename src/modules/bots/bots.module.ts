@@ -13,11 +13,7 @@ import { WebhooksModule } from '../webhooks/webhooks.module';
 import { BOTS_REDIS_CLIENT } from './bots.constants';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Bot]),
-    TenantsModule,
-    WebhooksModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Bot]), TenantsModule, WebhooksModule],
   controllers: [BotsController],
   providers: [
     BotsService,

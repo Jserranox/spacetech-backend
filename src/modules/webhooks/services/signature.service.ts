@@ -15,13 +15,13 @@ export class SignatureService {
 
   constructor(private readonly configService: ConfigService) {
     const hexKey = this.configService.get<string>('WEBHOOK_ENCRYPTION_KEY', '');
-    this.encryptionKey = hexKey
-      ? Buffer.from(hexKey, 'hex')
-      : randomBytes(32);
+    this.encryptionKey = hexKey ? Buffer.from(hexKey, 'hex') : randomBytes(32);
   }
 
   sign(payload: string, secret: string): string {
-    return 'sha256=' + createHmac('sha256', secret).update(payload).digest('hex');
+    return (
+      'sha256=' + createHmac('sha256', secret).update(payload).digest('hex')
+    );
   }
 
   verify(payload: string, signature: string, secret: string): boolean {
@@ -38,7 +38,10 @@ export class SignatureService {
   encryptSecret(secret: string): string {
     const iv = randomBytes(12);
     const cipher = createCipheriv('aes-256-gcm', this.encryptionKey, iv);
-    const encrypted = Buffer.concat([cipher.update(secret, 'utf8'), cipher.final()]);
+    const encrypted = Buffer.concat([
+      cipher.update(secret, 'utf8'),
+      cipher.final(),
+    ]);
     const tag = (cipher as any).getAuthTag() as Buffer;
     return `${iv.toString('hex')}:${tag.toString('hex')}:${encrypted.toString('hex')}`;
   }

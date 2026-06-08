@@ -22,7 +22,16 @@ export class MembersService {
   async listMembers(orgId: string): Promise<Partial<User>[]> {
     return this.userRepo.find({
       where: { organizationId: orgId },
-      select: ['id', 'email', 'firstName', 'lastName', 'role', 'avatarUrl', 'lastLoginAt', 'createdAt'],
+      select: [
+        'id',
+        'email',
+        'firstName',
+        'lastName',
+        'role',
+        'avatarUrl',
+        'lastLoginAt',
+        'createdAt',
+      ],
       order: { createdAt: 'ASC' },
     });
   }
@@ -34,7 +43,9 @@ export class MembersService {
       where: { email: normalized, organizationId: orgId },
     });
     if (alreadyMember) {
-      throw new ConflictException('User is already a member of this organization');
+      throw new ConflictException(
+        'User is already a member of this organization',
+      );
     }
 
     // Single-org constraint: user can only belong to one org
@@ -42,7 +53,9 @@ export class MembersService {
       where: { email: normalized },
     });
     if (existingElsewhere) {
-      throw new ConflictException('A user with this email already belongs to another organization');
+      throw new ConflictException(
+        'A user with this email already belongs to another organization',
+      );
     }
 
     const inviteToken = crypto.randomBytes(32).toString('hex');
@@ -62,7 +75,11 @@ export class MembersService {
     return { id: saved.id, email: saved.email, role: saved.role };
   }
 
-  async remove(orgId: string, memberId: string, requesterId: string): Promise<void> {
+  async remove(
+    orgId: string,
+    memberId: string,
+    requesterId: string,
+  ): Promise<void> {
     if (memberId === requesterId) {
       throw new BadRequestException('You cannot remove yourself');
     }
@@ -70,14 +87,17 @@ export class MembersService {
     const target = await this.userRepo.findOne({
       where: { id: memberId, organizationId: orgId },
     });
-    if (!target) throw new NotFoundException('Member not found in this organization');
+    if (!target)
+      throw new NotFoundException('Member not found in this organization');
 
     if (target.role === MemberRole.OWNER) {
       const ownerCount = await this.userRepo.count({
         where: { organizationId: orgId, role: MemberRole.OWNER },
       });
       if (ownerCount <= 1) {
-        throw new BadRequestException('Cannot remove the only owner of the organization');
+        throw new BadRequestException(
+          'Cannot remove the only owner of the organization',
+        );
       }
     }
 
@@ -95,14 +115,19 @@ export class MembersService {
     const target = await this.userRepo.findOne({
       where: { id: memberId, organizationId: orgId },
     });
-    if (!target) throw new NotFoundException('Member not found in this organization');
+    if (!target)
+      throw new NotFoundException('Member not found in this organization');
 
     if (dto.role === MemberRole.OWNER) {
-      throw new ForbiddenException('Use transfer ownership to promote a member to owner');
+      throw new ForbiddenException(
+        'Use transfer ownership to promote a member to owner',
+      );
     }
 
     if (target.role === MemberRole.OWNER) {
-      throw new ForbiddenException('Cannot change the owner role directly; use transfer ownership');
+      throw new ForbiddenException(
+        'Cannot change the owner role directly; use transfer ownership',
+      );
     }
 
     await this.userRepo.update(memberId, { role: dto.role });

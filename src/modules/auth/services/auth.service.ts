@@ -14,11 +14,15 @@ import { TokenService } from './token.service';
 import { LoginDto } from '../dtos/login.dto';
 import { RegisterDto } from '../dtos/register.dto';
 import { AuthResponseDto } from '../dtos/auth-response.dto';
-import { JwtPayload, JwtRefreshPayload } from '../interfaces/jwt-payload.interface';
+import {
+  JwtPayload,
+  JwtRefreshPayload,
+} from '../interfaces/jwt-payload.interface';
 import { BCRYPT_SALT_ROUNDS } from '../constants/auth.constants';
 
 // Dummy hash for timing-safe login (prevents user enumeration via timing)
-const DUMMY_HASH = '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4tbqBHCFi6';
+const DUMMY_HASH =
+  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4tbqBHCFi6';
 
 @Injectable()
 export class AuthService {
@@ -71,7 +75,8 @@ export class AuthService {
     const hashToCompare = user?.passwordHash ?? DUMMY_HASH;
     const isValid = await bcrypt.compare(dto.password, hashToCompare);
 
-    if (!user || !isValid) throw new UnauthorizedException('Invalid credentials');
+    if (!user || !isValid)
+      throw new UnauthorizedException('Invalid credentials');
 
     return this.buildAuthResponse(user);
   }
@@ -86,7 +91,9 @@ export class AuthService {
     if (tokenIndex === -1) {
       // Reuse detected — invalidate ALL refresh tokens for this user
       await this.userRepo.update(user.id, { refreshTokenIds: [] });
-      throw new UnauthorizedException('Refresh token reuse detected. All sessions revoked.');
+      throw new UnauthorizedException(
+        'Refresh token reuse detected. All sessions revoked.',
+      );
     }
 
     // Remove consumed tokenId before issuing new pair (rotation)
@@ -100,7 +107,7 @@ export class AuthService {
 
   async logout(userId: string, rawRefreshToken: string): Promise<void> {
     try {
-      const decoded = this.jwtService.decode(rawRefreshToken) as JwtRefreshPayload;
+      const decoded = this.jwtService.decode(rawRefreshToken);
       if (!decoded?.tokenId || decoded.sub !== userId) return;
 
       const user = await this.userRepo.findOne({ where: { id: userId } });

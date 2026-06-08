@@ -16,10 +16,10 @@ export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<MemberRole[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredRoles = this.reflector.getAllAndOverride<MemberRole[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     if (!requiredRoles?.length) return true;
 
@@ -29,12 +29,16 @@ export class RolesGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
-    const request = context.switchToHttp().getRequest<Record<string, unknown>>();
+    const request = context
+      .switchToHttp()
+      .getRequest<Record<string, unknown>>();
     const user = request['user'] as JwtPayload | undefined;
     if (!user?.role) return false;
 
     const userRank = ROLE_HIERARCHY[user.role as MemberRole] ?? 0;
-    const minRequired = Math.min(...requiredRoles.map((r) => ROLE_HIERARCHY[r] ?? 0));
+    const minRequired = Math.min(
+      ...requiredRoles.map((r) => ROLE_HIERARCHY[r] ?? 0),
+    );
 
     return userRank >= minRequired;
   }

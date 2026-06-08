@@ -1,4 +1,11 @@
-import { IsEnum, IsInt, IsObject, IsOptional, IsUUID, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsObject,
+  IsOptional,
+  IsUUID,
+  Min,
+} from 'class-validator';
 import { AnalyticsEventType } from '@aero-agent/database';
 
 export class TrackEventDto {

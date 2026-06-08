@@ -20,7 +20,10 @@ import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RefreshTokenGuard } from '../guards/refresh-token.guard';
 import { Public } from '../decorators/public.decorator';
 import { CurrentUser } from '../decorators/current-user.decorator';
-import { JwtPayload, JwtRefreshPayload } from '../interfaces/jwt-payload.interface';
+import {
+  JwtPayload,
+  JwtRefreshPayload,
+} from '../interfaces/jwt-payload.interface';
 
 @Controller('auth')
 @UseGuards(JwtAuthGuard)

@@ -4,7 +4,10 @@ import { Tool } from '../decorators/tool.decorator';
 import { ITool, ToolParameterSchema } from '../interfaces/tool.interface';
 import { IToolResult } from '../interfaces/tool-result.interface';
 
-@Tool({ name: 'esa_missions', description: 'Consulta misiones y datos de la Agencia Espacial Europea' })
+@Tool({
+  name: 'esa_missions',
+  description: 'Consulta misiones y datos de la Agencia Espacial Europea',
+})
 @Injectable()
 export class EsaTool implements ITool {
   name = 'esa_missions';
@@ -26,7 +29,8 @@ export class EsaTool implements ITool {
 
   constructor(private readonly configService: ConfigService) {
     this.baseUrl =
-      this.configService.get<string>('ESA_BASE_URL') || 'https://esasky.esac.esa.int';
+      this.configService.get<string>('ESA_BASE_URL') ||
+      'https://esasky.esac.esa.int';
   }
 
   async execute(params: Record<string, unknown>): Promise<IToolResult> {

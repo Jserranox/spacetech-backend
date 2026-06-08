@@ -14,7 +14,7 @@ export class OllamaProvider implements ILlmProvider {
   ): AsyncIterable<string> {
     const stream = await this.client.chat({
       model: config.model,
-      messages: messages as { role: string; content: string }[],
+      messages: messages,
       stream: true,
       options: {
         temperature: config.temperature,

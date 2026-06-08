@@ -41,12 +41,16 @@ export class UsageService {
       this.analyticsRepo
         .createQueryBuilder('event')
         .where('event.organizationId = :orgId', { orgId })
-        .andWhere('event.eventType = :type', { type: AnalyticsEventType.MESSAGE_SENT })
+        .andWhere('event.eventType = :type', {
+          type: AnalyticsEventType.MESSAGE_SENT,
+        })
         .andWhere('event.createdAt >= :from', { from: startOfMonth })
         .getCount(),
       this.docRepo.count({ where: { organizationId: orgId } }),
       this.botRepo.count({ where: { organizationId: orgId } }),
-      this.apiKeyRepo.count({ where: { organizationId: orgId, isActive: true } }),
+      this.apiKeyRepo.count({
+        where: { organizationId: orgId, isActive: true },
+      }),
       this.userRepo.count({ where: { organizationId: orgId } }),
     ]);
 

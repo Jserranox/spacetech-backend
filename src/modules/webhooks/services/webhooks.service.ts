@@ -48,7 +48,11 @@ export class WebhooksService {
     return webhook;
   }
 
-  async update(id: string, orgId: string, dto: UpdateWebhookDto): Promise<Webhook> {
+  async update(
+    id: string,
+    orgId: string,
+    dto: UpdateWebhookDto,
+  ): Promise<Webhook> {
     const webhook = await this.findOne(id, orgId);
     if (dto.url !== undefined) webhook.url = dto.url;
     if (dto.events !== undefined) webhook.events = dto.events;
@@ -56,7 +60,11 @@ export class WebhooksService {
     return this.webhookRepo.save(webhook);
   }
 
-  async toggleActive(id: string, orgId: string, isActive: boolean): Promise<Webhook> {
+  async toggleActive(
+    id: string,
+    orgId: string,
+    isActive: boolean,
+  ): Promise<Webhook> {
     const webhook = await this.findOne(id, orgId);
     webhook.isActive = isActive;
     return this.webhookRepo.save(webhook);
@@ -67,7 +75,10 @@ export class WebhooksService {
     await this.webhookRepo.softDelete(id);
   }
 
-  async findActiveByOrgAndEvent(orgId: string, event: WebhookEvent): Promise<Webhook[]> {
+  async findActiveByOrgAndEvent(
+    orgId: string,
+    event: WebhookEvent,
+  ): Promise<Webhook[]> {
     return this.webhookRepo
       .createQueryBuilder('webhook')
       .where('webhook.organizationId = :orgId', { orgId })
@@ -82,9 +93,17 @@ export class WebhooksService {
     statusCode: number | null,
     success: boolean,
   ): Promise<void> {
-    await this.webhookRepo.increment({ id, organizationId: orgId }, 'totalDeliveries', 1);
+    await this.webhookRepo.increment(
+      { id, organizationId: orgId },
+      'totalDeliveries',
+      1,
+    );
     if (!success) {
-      await this.webhookRepo.increment({ id, organizationId: orgId }, 'failedDeliveries', 1);
+      await this.webhookRepo.increment(
+        { id, organizationId: orgId },
+        'failedDeliveries',
+        1,
+      );
     }
     await this.webhookRepo.update(
       { id, organizationId: orgId },
