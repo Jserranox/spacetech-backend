@@ -1,10 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ToolsService } from './services/tools.service';
-import {
-  ToolRegistryService,
-  TOOLS_TOKEN,
-} from './services/tool-registry.service';
+import { ToolRegistryService } from './services/tool-registry.service';
+import { TOOLS_TOKEN } from './constants/tools.constants';
 import { NasaTool } from './tools/nasa.tool';
 import { EsaTool } from './tools/esa.tool';
 import { FaaTool } from './tools/faa.tool';

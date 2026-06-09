@@ -1,16 +1,22 @@
-import {
-  Injectable,
-  Inject,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { IDocumentParser } from '../parsers/parser.interface';
-import { DOCUMENT_PARSERS } from '../constants/knowledge.constants';
+import { PdfParser } from '../parsers/pdf.parser';
+import { DocxParser } from '../parsers/docx.parser';
+import { TxtParser } from '../parsers/txt.parser';
+import { UrlParser } from '../parsers/url.parser';
 
 @Injectable()
 export class ExtractionService {
+  private readonly parsers: IDocumentParser[];
+
   constructor(
-    @Inject(DOCUMENT_PARSERS) private readonly parsers: IDocumentParser[],
-  ) {}
+    private readonly pdfParser: PdfParser,
+    private readonly docxParser: DocxParser,
+    private readonly txtParser: TxtParser,
+    private readonly urlParser: UrlParser,
+  ) {
+    this.parsers = [pdfParser, docxParser, txtParser, urlParser];
+  }
 
   async extractText(buffer: Buffer, mimeType: string): Promise<string> {
     const parser = this.parsers.find((p) => p.mimeTypes.includes(mimeType));

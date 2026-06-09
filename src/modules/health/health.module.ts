@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TerminusModule } from '@nestjs/terminus';
 import Redis from 'ioredis';
-import { StorageService } from '../knowledge/services/storage.service';
+import { KnowledgeModule } from '../knowledge/knowledge.module';
 import { HealthController } from './controllers/health.controller';
 import { DatabaseHealthIndicator } from './indicators/database.indicator';
 import { LlmHealthIndicator } from './indicators/llm.indicator';
@@ -13,7 +13,10 @@ import {
 import { StorageHealthIndicator } from './indicators/storage.indicator';
 
 @Module({
-  imports: [TerminusModule.forRoot({ errorLogStyle: 'pretty' })],
+  imports: [
+    TerminusModule.forRoot({ errorLogStyle: 'pretty' }),
+    KnowledgeModule,
+  ],
   controllers: [HealthController],
   providers: [
     {
@@ -22,7 +25,6 @@ import { StorageHealthIndicator } from './indicators/storage.indicator';
       useFactory: (config: ConfigService) =>
         new Redis(config.get<string>('REDIS_URL', 'redis://localhost:6379')),
     },
-    StorageService,
     DatabaseHealthIndicator,
     RedisHealthIndicator,
     StorageHealthIndicator,

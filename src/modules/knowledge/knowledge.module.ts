@@ -20,7 +20,6 @@ import { PdfParser } from './parsers/pdf.parser';
 import { DocxParser } from './parsers/docx.parser';
 import { TxtParser } from './parsers/txt.parser';
 import { UrlParser } from './parsers/url.parser';
-import { DOCUMENT_PARSERS } from './constants/knowledge.constants';
 
 @Module({
   imports: [
@@ -41,16 +40,6 @@ import { DOCUMENT_PARSERS } from './constants/knowledge.constants';
     DocxParser,
     TxtParser,
     UrlParser,
-    {
-      provide: DOCUMENT_PARSERS,
-      useFactory: (
-        pdf: PdfParser,
-        docx: DocxParser,
-        txt: TxtParser,
-        url: UrlParser,
-      ) => [pdf, docx, txt, url],
-      inject: [PdfParser, DocxParser, TxtParser, UrlParser],
-    },
   ],
   exports: [DocumentsService, StorageService, ExtractionService],
 })

@@ -1,8 +1,9 @@
 import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
 import { ITool } from '../interfaces/tool.interface';
 import { TOOL_METADATA_KEY } from '../decorators/tool.decorator';
+import { TOOLS_TOKEN } from '../constants/tools.constants';
 
-export const TOOLS_TOKEN = 'TOOLS_TOKEN';
+export { TOOLS_TOKEN };
 
 @Injectable()
 export class ToolRegistryService implements OnModuleInit {
